@@ -1,0 +1,240 @@
+Level 0 --> Level 1
+Login giving password as "bandit0".
+Doing "ls" shows us a 'readme' file, which we can read by issuing a 'cat readme'.
+Password for Level 1 is boJ9jbbUNNfktd78OOpsqOltutMc3MY1
+
+Level 1 --> Level 2
+In Linux, '-' a.k.a stdin is a special character.
+Doing "ls" on our current directory which is ~/ (Home Dir), we see a file name '-'.
+We can thus open the file by including the path directory --" cat /home/bandit1/- "
+Password for Level 2 is CV1DtqXWVFXTvM2F0k09SHz0YwRINYA9
+
+Level 2 --> Level 3
+Spaces in a file name can usually by masked with an escape character, a.k.a "\ ".
+Since terminal uses space as a fied seperator, we can use \ to indicate terminal that this is a special case, hence \ is known as escape character
+and we need to "escape" the normal functionality of space, achieved by "\ "
+" cat spaces\ in\ this\ filename " gives us the password. We could also abuse terminal's tab completion which will in turn put the spaces for us.
+Password for Level 3 is UmHadQclWmgdLOKQ3YNgjWxGoRMb5luK
+
+Level 3 --> Level 4
+Issuing an "ls" command in our pwd (present working directory, also a command to show the same) we see a folder called "inhere/"
+" cd inhere/ " takes us into the folder, but this time "ls" returns nothing. This is because, "ls" by itself does not show hidden files.
+" ls -al " shows us all the files(-a) including but not limited to hidden files, in long form(-l), which combined by "ls -al" shows us all the
+files in a long form. We then see a file '.hidden'. " cat .hidden " gives us the password.
+Password for Level 4 is pIwrPrtPN36QITSp3EQaw936yaFoFgAB
+
+Level 4 --> Level 5
+The " file <filename> " command shows us the destination file type. A " * " is a wildcard character indicating 0 or more files.
+Now since all the filenames have a prepended " - ", we cannot directly issue the file command.
+To successfully operate on a file with a special character, we include the path directory. Thus, executing " file ./* | grep ASCII "
+In bash, " . " indicates pwd aka present working directory, followed by " * " meaning 0 or more files. " grep ASCII " searches for ASCII in out output, since that is the human readable format.
+" cat ./-file07 " gives us our password.
+Password for Level 5 is koReBOKuIDDepwhWk7jZC0RTdopnAYKh
+
+Level 5 --> Level 6
+" file $(find ./* -size 1033c -type f) " gives us the file containing our password. As given, we know that the file we are looking for has a size of 1033 bytes, and is human readable a.k.a ASCII.
+Copy the output path to file and prepend a cat to read it.
+We could also make this a one step process by issuing " cat $(file $(find ./* -size 1033c -type f) | cut -d: -f 1) "
+Password for Level 6 is DXjZPULLxYr17uwoI01bNLQbtFemEgo7
+
+Level 6 --> Level 7
+Since we are looking for the password for bandit7, we could use " find / -size 33c | grep bandit7 " and look for the ones that do not have a Permission Denied appended.
+" /var/lib/dpkg/info/bandit7.password " is the file of interest. Using cat on the path, we obtain out password.
+Password for Level 7 is HKBPTKQnIay4Fw76bEy8PVxKEDQRKTzs
+
+Level 7 --> Level 8
+This one says our password is next to the word millionth. Let's print out the line containing 'millionth' by ' cat data.txt | grep "millionth" '.
+For a one liner, " cat data.txt  | grep millionth | tr -d {millionth} | tr -d [:space:] "
+Password for Level 8 is cvX2JJa4CFALtqS87jk27qwqGhBM9plV
+
+Level 8 --> Level 9
+Here, we first sort out the output of our " cat data.txt " and then print out only the unique line(s) occuring once, which is how w eget out password.
+This is also a one liner, " cat data.txt | sort | uniq -u "
+Password for Level 9 is UsvVyFSfZZWbi6wgC7dAFyFuR6jQQUhR
+
+Level 9 --> Level 10
+Intiutively, one would try " cat data.txt | grep ===== " from the premise of our hint given. But turns out that it is a binary file disguised in a .txt format.
+Doing a " file data.txt " returns ' data ' type, and not ASCII. Hence, we use " strings data.txt | grep =====" 
+For a one liner, " echo $(strings data.txt | grep ===== | tr -d {=====} | tail -n 1 | tr -d [:space:]) " should do just fine!
+Password for Level 10 is truKLdjsbJ5g7yyJ2X2R0o3a5HQJFuLk
+
+Level 10 --> Level 11
+" cat data.txt | base64 -d - " base64 -d decodes the base64 encoded data in data.txt.
+For a one liner, " cat data.txt | base64 -d - | cut -d" " -f 4 "
+Password for Level 11 is IFukwKGsFW8MOq3IRFqrxE1hxTNEbUPR
+
+Level 11 --> Level 12
+If we read data.txt, all the alphabets are rotated/shifted by 13 postitions. We could either use an online Rot13 decoder or the local commandline for decoding this.    
+' tr ' command means translate. We could ask it to shift all the alphabets, capital and small alike, by 13 positions.  
+For a one liner, " cat data.txt | tr '[A-Za-z]' '[N-ZA-Mn-za-m]' | cut -d" " -f 4 "
+Password for Level 12 is 5Te8Y4drgCRfCx8ugdwuEX8KFC6k2EUu
+
+Level 12 --> Level 13
+Not difficult, but ugh, this level is a headache. In order to work with " data.txt ", we need to move to a temp directory in order to get write privileges.
+We can write into the ~/ (home) directory. " cd $(mktemp -d); cp ~/data.txt . " will make a temp dir and take you there, and copy the needed data.txt into the temp folder.
+" xxd " is a tool for reversing hexdumps. " xxd -r data.txt > data " makes a new file ' data ' out of the output of the reversed hexdump.
+" file data " gives data was a gzip compressed file. " mv data data.gz " -- renames the data to data.gz for gzip to work. " gzip -d data.gz " decompresses the file.
+" file data " tells us it is a bzip2 compressed file, hence we " mv data data.bz2 " and then " bzip2 -d data.bz2 "
+file tells us the new file was a gzip compresed file, now we reiterate on our previous steps to obtain a TAR archive called ' data '
+" mv data data.tar; tar xvf data.tar " we get data5.bin, which also is a tar archive. " mv data5.bin data.tar; tar xvf data.tar " gives us data6.bin, which is a bzip2 compressed archive.
+" mv data6.bin data6.bz2; bzip2 -d data6.bz2 "
+" mv data6 data6.tar; tar xvf data6.tar "
+" file data8.bin " to check its file type, which turns out to be a gzip compressd file. " mv data8.bin data8.gz; gzip -d data8.gz "
+Finally we obtain data8, which seems to be an ASCII file. " cat data8 " gives us the password.
+Password for Level 13 is 8ZjyCRiBWFYkneahHwxCv3wb2a1ORpYL
+
+Level 13 --> Level 14
+Here we are presented with ' sshkey.private ' which we can use to login via ssh to out next level, Level 14.
+" ssh -i sshkey.private bandit14@localhost "
+" cat /etc/bandit_pass/bandit14 " gives us the password.
+Password for Level 14 is 4wcYUJFw0k0XLShlDzztnTBHiqxU3b3e
+
+Level 14 --> Level 15
+This level teaches us some nc (netcat) basics. We connect via " nc localhost 30000 " and enter our password to Level 14.
+Password for Level 15 is BfMYroe26WYalil77FoDi9qh59eK5xNr
+
+Level 15 --> level 16
+This level teaches us to connect via SSL, for which we use ' openssl '.
+" openssl s_client -ign_eof -connect localhost:30001 " and enter the password to Level 15.
+Password for Level 16 is cluFn7wTiGryunymYOu4RcffSxQluehd
+
+Level 16 --> Level 17
+" nmap localhost -p31000-32000 "
+We are presented with two open ports. Adding a -sV option shows us the running services.
+Ports 31518 & 31790 are shown open.
+" cat /etc/bandit_pass/bandit16 | openssl s_client -connect localhost:31790 -quiet " gives us a private ssh key, which can be used to login to the next level.
+Copy from the " --BEGIN RSA to ---END RSA KEY " and paste it into a file we create with " cd $(mktemp -d); nano sshkey.private; chmod 600 sshkey.private "
+(chmod 600 only gives owner read/write permission and not the others. chmod 777 is too insecure as it gives rwx permissions to everyone)
+Save the file with Ctrl+O and Ctrl+X to exit.
+" ssh -i sshkey.private bandit17@localhost " gives us the password.
+Password for Level 17 is xLYVMN9WE5zQ5vHacb0sZEVqbrp7nBTn
+
+Level 17 --> Level 18
+" diff -y passowrd.old password.new " gives us a side by side comparision of two files with marked differences. Exactly what we want.
+Password for Level 18 is kfBf3eYk5BPBRzwjqutbbfE887SVc5Yd
+
+Level 18 --> Level 19
+If we try to login like usual, even upon giving the correct passowrd it terminated the connection. This seems to be linked to the PTY shown at login.
+We can alter this behaviour by adding " -T ", which disables pseudo-terminal allocation.
+" ssh bandit18@bandit.labs.overthewire.org -p 2220 -T "
+After logging in, there is a readme file. " cat readme " gives us the passord.
+Password for Level 19 is IueksS7Ubh8G3DCwVzrTd8rAVOwq3M5x
+
+Level 19 --> Level 20
+We are presented with a file called ' bandit20-do ', which seems to be highlighted in red.
+This means that the file has a setuid, which gives that file permission to be executed by an unprivileged user as another user.
+" ls -l " shows owner of the file as ' bandit20 ', which gives us the ability to read the password file at /etc/bandit_pass/bandit20
+Thus, we execute " ./bandit20-do cat /etc/bandit_pass/bandit20 "
+Password for Level 20 is GbKksEFF4yrVs6il55v6gwY5aVje5f0j
+
+Level 20 --> Level 21
+' echo "GbKksEFF4yrVs6il55v6gwY5aVje5f0j" | nc -l localhost -p 60006 & ' sends our current level's password to a listening port on localhost.
+We then connect to it via ./suconnect binary in our home dir by " ./suconnect 60006 " and we get our password for the next level
+Password for Level 21 is gE269g2h3mw3pwgrj0Ha9Uoqen1c9DGr
+
+Level 21 --> Level 22
+Cron jobs are basically *NIX's way to automate specific tasks.
+We are asked to look into /etc/cron.d/ where system-wide cronjobs are palced.. " cd /etc/cron.d "
+If we look into te dir, we can see 3 files. For now we are interested in bandit22's cronjob as that is the next level.
+This points us to a script, which we read by " cat /usr/bin/cronjob_bandit22.sh "
+Turns out bandit22's password file at /etc/bandit_pass/bandit22 is read and output, which we then read by 
+" cat /tmp/t7O6lds9S0RqQh9aMcz6ShpAoZKF7fgv " giving us the password.
+Password for Level 22 is Yk7owGAcWjwMVRwrTesJEwB7WVOiILLI
+
+Level 22 --> Leve 23
+Similar to the previous level, we straight away do " cat /etc/cron.d/cronjob_bandit23 " which points us to a script which we read by
+" cat /usr/bin/cronjob_bandit23.sh "
+Our line of interest is - " mytarget=$(echo I am user $myname | md5sum | cut -d ' ' -f 1) "
+Hmm, if we alter the $myname variable to 'bandit23'
+" mytarget=$(echo I am user bandit23 | md5sum | cut -d ' ' -f 1) " we obtain an output, which can be read by 
+" echo $mytarget gives us 8ca319486bfbbc3663ea0fbe81326349 "
+According to the script, the cronjob pasted the password into the file /tmp/$myname.
+Thus, " cat /tmp/8ca319486bfbbc3663ea0fbe81326349 " yields us the password.
+Password for Level 23 is jc1udXuA1tiHqjIsL8yaapX5XIAI6i0n
+
+Level 23 --> Level 24
+Without further delay, do " cat /etc/cron.d/cronjob_bandit24 "
+Points us to a script at " /usr/bin/cronjob_bandit24.sh " doing an ls -l on the script we see that bandit24 owns the file.
+Which means, $whoami will be bandit24, hence we need to palce our script at the folder /var/spool/bandit24/
+We make a script called h4ckdeeznuts.sh containing,
+#---
+#!/bin/bash
+cat /etc/bandit_pass/bandit24 > /tmp/yourcreativefoldername/pass
+#---
+" chmod 777 h4ckdeeznuts.sh; cp h4ckdeeznuts.sh /var/spool/bandit24/ "
+" cat /tmp/yourcreativefoldername/pass " should give you the password. 
+Password for Level 24 is UoMYTrfrBFHyQXmg6gzctqAwOmw1IohZ
+
+Level 24 --> Level 25
+Execute the " nc localhost 30002 " to see its behaviour and the syntax it accepts the password in.
+We see that it needs the current level password and a four digit pin with spaces. Took me a while to come up with this,
+Here's a one liner:
+j=$(mktemp -d); echo -e "UoMYTrfrBFHyQXmg6gzctqAwOmw1IohZ"" "{0000..9999}'\n' > $j/pins && cd $j && cat pins | nc localhost 30002
+
+Password for Level 25 is uNG9O58gUE7snukf3bvZ0rxhtnjzSGzG
+
+Levle 25 --> Level 26
+This one may seem tricky at first, and isn't exactly begginer friendly (in my case at least)
+Logging into level 26 with the ssh key provided works, but we are logged out immediately. We should check the type of shell 
+being used by bandit26.
+" cat /etc/passwd | grep bandit26 " shows us it is not a shell, but a text file at ' /usr/bin/showtext '
+This line seems interesting; " more ~/text.txt " --> shows us that there is a text file being read at bandit26 home, using ' more ' mode. [read the man page on more]
+By resizing out terminal window, we can force it to execute ` ` more ` and not exit immediately. 
+Basically, ` more ` has a vi mode, which can be accessed by pressing v, and vi can be used to access shell. Hence we type the following (dont worry about the feedback)
+v
+:set shell=/bin/bash
+:shell
+now we have logged into bandit26, we do " cat /etc/bandit_pass/bandit26 " for the password
+Do not log out of Level 26, or if you do, repeat the steps to obtain shell.
+Password for Level 26 is 5czgV9L3Xx8JPOyRbXh6lQbmIOWvPT6Z
+
+Level 26 --> Level 27
+" ./bandit27-do cat /etc/bandit_pass/bandit27 "
+Password for Level 27 is 3ba3118a22e93127a4ed485be72ef5ea
+
+Level 27 --> Level 28
+This level requires us to learn ' git '. It is quite beneficial to know basics of git, like creating a repository,
+changing branches, and so on. There are plenty of YouTube content covering this!
+" cd $(mktemp -d); git clone ssh://bandit27-git@localhost/home/bandit27-git/repo; cd repo/ ; cat README "-- gives us our password.
+Password for Level 28 is 0ef186ac70e04ea33b4c1853d2526fa2
+
+Level 28 --> Level 29
+" cd $(mktemp -d); git clone ssh://bandit28-git@localhost/home/bandit28-git/repo; cd repo/; cat README.md "
+This shows us the password as xxxxxx. Hmm. Maybe we could check this file's history?
+" git log -p README.md | grep password " yields us the password
+Password for Level 29 is bbc96594b4e001778eee9975372716b2
+
+Level 29 --> Level 30
+" cd $(mktemp -d); git clone ssh://bandit29-git@localhost/home/bandit29-git/repo; cd repo/ "
+" cat README.md " gives us nothing. We could try maybe changing the branch from master to something else?
+Lets see what branches do we have available by " git branch -a ". We can also see what branch you are in by " git branch "
+Switch to the /dev branch by issuing " git checkout dev " and then try reading the README.md. We get our password! 
+Password for Level 30 is 5b90576bedb2cc04c86a9e924ce42faf
+
+Level 30 --> Level 31
+" cd $(mktemp -d); git clone ssh://bandit30-git@localhost/home/bandit30-git/repo; cd repo/ "
+" cat README.md " is no good, even when we check its commit history by " git log -p README.md "
+Lets see if the .git folder has something for us. " cd /.git "
+" cat packed-refs " shows us an alphanumeric line with refs/tags/secret. Hmm, seems like this could take us somewhere
+" git show f17132340e8ee6c159e0a4a6bc6f80e1da3b1aea " gives us an output, which is our password.
+Password for Level 31 is 47e603bb428404d265f59c42920d81e5
+
+Level 31 --> Level 32
+" cd $(mktemp -d); git clone ssh://bandit31-git@localhost/home/bandit31-git/repo; cd repo/ " takes us into the repo folder.
+README.md tells us to create a file called ' key.txt ' containing ' May I come in? ' which we do with " nano key.txt " and adding " May I come in? "
+" git add key.txt -f " #force add despite .gitignore
+" git status " #to confirm
+" git commit -m "message" "
+" git push origin master " --> and give the password. A message is displayed which has out password for the next level.
+Password for Level 32 is 56a9bf19c63d650ce78e6ec0354ee45e
+
+
+Level 32 --> Level 33
+Logging in, we are greeted with a shell which makes everything we type into uppercase [suspect 'tr' in action]
+We can easily switch to a pty with " $0 " which exits the Uppercase Shell into a pty, and we do a " whoami " telling us we are bandit33. GG!
+" cat /etc/bandit_pass/bandit33 " -- into victory!
+Password for Level 33 is c9c3199ddf4121b10cf581a98d51caee
+
+Level 33 
+We have a README file which tells us this is it for now!
+This was one hell of a ride and I did learn quite a few things along the way.. This is why CTFs are awesome.
