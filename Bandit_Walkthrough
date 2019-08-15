@@ -54,7 +54,7 @@ Password for Level 9 is UsvVyFSfZZWbi6wgC7dAFyFuR6jQQUhR
 
 Level 9 --> Level 10
 Intiutively, one would try " cat data.txt | grep ===== " from the premise of our hint given. But turns out that it is a binary file disguised in a .txt format.
-Doing a " file data.txt " returns ' data ' type, and not ASCII. Hence, we use " strings data.txt | grep =====" 
+Doing a " file data.txt " returns ' data ' type, and not ASCII. Hence, we use " strings data.txt | grep ====="
 For a one liner, " echo $(strings data.txt | grep ===== | tr -d {=====} | tail -n 1 | tr -d [:space:]) " should do just fine!
 Password for Level 10 is truKLdjsbJ5g7yyJ2X2R0o3a5HQJFuLk
 
@@ -64,15 +64,15 @@ For a one liner, " cat data.txt | base64 -d - | cut -d" " -f 4 "
 Password for Level 11 is IFukwKGsFW8MOq3IRFqrxE1hxTNEbUPR
 
 Level 11 --> Level 12
-If we read data.txt, all the alphabets are rotated/shifted by 13 postitions. We could either use an online Rot13 decoder or the local commandline for decoding this.    
-' tr ' command means translate. We could ask it to shift all the alphabets, capital and small alike, by 13 positions.  
+If we read data.txt, all the alphabets are rotated/shifted by 13 postitions. We could either use an online Rot13 decoder or the local commandline for decoding this.
+' tr ' command means translate. We could ask it to shift all the alphabets, capital and small alike, by 13 positions.
 For a one liner, " cat data.txt | tr '[A-Za-z]' '[N-ZA-Mn-za-m]' | cut -d" " -f 4 "
 Password for Level 12 is 5Te8Y4drgCRfCx8ugdwuEX8KFC6k2EUu
 
 Level 12 --> Level 13
 Not difficult, but ugh, this level is a headache. In order to work with " data.txt ", we need to move to a temp directory in order to get write privileges.
 We can write into the ~/ (home) directory. " cd $(mktemp -d); cp ~/data.txt . " will make a temp dir and take you there, and copy the needed data.txt into the temp folder.
-" xxd " is a tool for reversing hexdumps. " xxd -r data.txt > data " makes a new file ' data ' out of the output of the reversed hexdump.
+" xxd " is a tool for reversing hexdumps, binary conversion and so on. " xxd -r data.txt > data " makes a new file ' data ' out of the output of the reversed hexdump.
 " file data " gives data was a gzip compressed file. " mv data data.gz " -- renames the data to data.gz for gzip to work. " gzip -d data.gz " decompresses the file.
 " file data " tells us it is a bzip2 compressed file, hence we " mv data data.bz2 " and then " bzip2 -d data.bz2 "
 file tells us the new file was a gzip compresed file, now we reiterate on our previous steps to obtain a TAR archive called ' data '
@@ -137,7 +137,7 @@ Cron jobs are basically *NIX's way to automate specific tasks.
 We are asked to look into /etc/cron.d/ where system-wide cronjobs are palced.. " cd /etc/cron.d "
 If we look into te dir, we can see 3 files. For now we are interested in bandit22's cronjob as that is the next level.
 This points us to a script, which we read by " cat /usr/bin/cronjob_bandit22.sh "
-Turns out bandit22's password file at /etc/bandit_pass/bandit22 is read and output, which we then read by 
+Turns out bandit22's password file at /etc/bandit_pass/bandit22 is read and output, which we then read by
 " cat /tmp/t7O6lds9S0RqQh9aMcz6ShpAoZKF7fgv " giving us the password.
 Password for Level 22 is Yk7owGAcWjwMVRwrTesJEwB7WVOiILLI
 
@@ -146,7 +146,7 @@ Similar to the previous level, we straight away do " cat /etc/cron.d/cronjob_ban
 " cat /usr/bin/cronjob_bandit23.sh "
 Our line of interest is - " mytarget=$(echo I am user $myname | md5sum | cut -d ' ' -f 1) "
 Hmm, if we alter the $myname variable to 'bandit23'
-" mytarget=$(echo I am user bandit23 | md5sum | cut -d ' ' -f 1) " we obtain an output, which can be read by 
+" mytarget=$(echo I am user bandit23 | md5sum | cut -d ' ' -f 1) " we obtain an output, which can be read by
 " echo $mytarget gives us 8ca319486bfbbc3663ea0fbe81326349 "
 According to the script, the cronjob pasted the password into the file /tmp/$myname.
 Thus, " cat /tmp/8ca319486bfbbc3663ea0fbe81326349 " yields us the password.
@@ -162,7 +162,7 @@ We make a script called h4ckdeeznuts.sh containing,
 cat /etc/bandit_pass/bandit24 > /tmp/yourcreativefoldername/pass
 #---
 " chmod 777 h4ckdeeznuts.sh; cp h4ckdeeznuts.sh /var/spool/bandit24/ "
-" cat /tmp/yourcreativefoldername/pass " should give you the password. 
+" cat /tmp/yourcreativefoldername/pass " should give you the password.
 Password for Level 24 is UoMYTrfrBFHyQXmg6gzctqAwOmw1IohZ
 
 Level 24 --> Level 25
@@ -175,11 +175,11 @@ Password for Level 25 is uNG9O58gUE7snukf3bvZ0rxhtnjzSGzG
 
 Levle 25 --> Level 26
 This one may seem tricky at first, and isn't exactly begginer friendly (in my case at least)
-Logging into level 26 with the ssh key provided works, but we are logged out immediately. We should check the type of shell 
+Logging into level 26 with the ssh key provided works, but we are logged out immediately. We should check the type of shell
 being used by bandit26.
 " cat /etc/passwd | grep bandit26 " shows us it is not a shell, but a text file at ' /usr/bin/showtext '
 This line seems interesting; " more ~/text.txt " --> shows us that there is a text file being read at bandit26 home, using ' more ' mode. [read the man page on more]
-By resizing out terminal window, we can force it to execute ` ` more ` and not exit immediately. 
+By resizing out terminal window, we can force it to execute ` ` more ` and not exit immediately.
 Basically, ` more ` has a vi mode, which can be accessed by pressing v, and vi can be used to access shell. Hence we type the following (dont worry about the feedback)
 v
 :set shell=/bin/bash
@@ -208,7 +208,7 @@ Level 29 --> Level 30
 " cd $(mktemp -d); git clone ssh://bandit29-git@localhost/home/bandit29-git/repo; cd repo/ "
 " cat README.md " gives us nothing. We could try maybe changing the branch from master to something else?
 Lets see what branches do we have available by " git branch -a ". We can also see what branch you are in by " git branch "
-Switch to the /dev branch by issuing " git checkout dev " and then try reading the README.md. We get our password! 
+Switch to the /dev branch by issuing " git checkout dev " and then try reading the README.md. We get our password!
 Password for Level 30 is 5b90576bedb2cc04c86a9e924ce42faf
 
 Level 30 --> Level 31
@@ -235,6 +235,6 @@ We can easily switch to a pty with " $0 " which exits the Uppercase Shell into a
 " cat /etc/bandit_pass/bandit33 " -- into victory!
 Password for Level 33 is c9c3199ddf4121b10cf581a98d51caee
 
-Level 33 
+Level 33
 We have a README file which tells us this is it for now!
 This was one hell of a ride and I did learn quite a few things along the way.. This is why CTFs are awesome.

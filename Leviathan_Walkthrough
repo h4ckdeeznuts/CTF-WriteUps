@@ -15,6 +15,7 @@ doing a whoami returns leviathan2
 " cat /etc/leviathan_pass/leviathan2 "
 Password for Level 2 is ougahZi8Ta
 
+
 Level 2 --> Level 3
 " cd $(mktemp -d); ln -s /etc/leviathan_pass/leviathan3 nothing; touch hereGoes\ nothing; chmod 777 .; ~/printfile hereGoes\ nothing;
 Password for Level 3 is Ahdiemoo1j
@@ -26,15 +27,18 @@ First we enter h0no33, then next time running ltrace on the same binary we see -
 Thus we get a shell
 Password for Level 4 is vuH0coox6m
 
+
 Level 4 --> Level 5
 " cd .trash/ ; ./bin " gives us a binary output which we can convert and obtain our password
 echo 01010100 01101001 01110100 01101000 00110100 01100011 01101111 01101011 01100101 01101001 00001010 | perl -lape '$_=pack"(B8)*",@F'
 Password for Level 5 is Tith4cokei
 
+
 Level 5 --> Level 6
 ./leviathan5 seems to search for file.log in /tmp and has a setuid. We could use this fact to create a hard-symlink.
 " ln -sf /etc/leviathan_pass/leviathan6 /tmp/file.log; ./leviathan5 "
 Password for Level 6 is UgaoFee4li
+
 
 Level 6 --> Level 7
 cd $(mktemp -d); nano script.sh; chmod +x script.sh
@@ -51,6 +55,7 @@ done
 
 The program stops midway with a shell, which indicated we got the right 4-digit pin.
 Password for Level 7 is ahy7MaeBo9
+
 
 Level 7 --> Level 8
 CONGRATULATIONS.
