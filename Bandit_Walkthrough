@@ -37,6 +37,7 @@ Now since all the filenames have a prepended " - ", we cannot directly issue the
 To successfully operate on a file with a special character, we include the path directory. Thus, executing " file ./* | grep ASCII "
 In bash, " . " indicates pwd aka present working directory, followed by " * " meaning 0 or more files. " grep ASCII " searches for ASCII in out output, since that is the human readable format.
 " cat ./-file07 " gives us our password.
+A one liner - cat $(file ./* | grep ASCII | awk '{print $1}' | cut -d":" -f1)
 
     Password for Level 5 is koReBOKuIDDepwhWk7jZC0RTdopnAYKh
 
