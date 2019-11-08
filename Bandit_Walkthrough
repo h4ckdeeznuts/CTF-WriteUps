@@ -45,21 +45,21 @@ A one liner - cat $(file ./* | grep ASCII | awk '{print $1}' | cut -d":" -f1)
 Level 5 --> Level 6
 " file $(find ./* -size 1033c -type f) " gives us the file containing our password. As given, we know that the file we are looking for has a size of 1033 bytes, and is human readable a.k.a ASCII.
 Copy the output path to file and prepend a cat to read it.
-We could also make this a one step process by issuing " cat $(file $(find ./* -size 1033c -type f) | cut -d: -f 1) "
-
+We could also make this a one step process by issuing "cat $(find * -type f -size 1033c)"
     Password for Level 6 is DXjZPULLxYr17uwoI01bNLQbtFemEgo7
 
 
 Level 6 --> Level 7
 Since we are looking for the password for bandit7, we could use " find / -size 33c | grep bandit7 " and look for the ones that do not have a Permission Denied appended.
 " /var/lib/dpkg/info/bandit7.password " is the file of interest. Using cat on the path, we obtain out password.
+One liner - cat $(find / -user bandit7 -group bandit6 -size 33c 2>/dev/null)
 
     Password for Level 7 is HKBPTKQnIay4Fw76bEy8PVxKEDQRKTzs
 
 
 Level 7 --> Level 8
 This one says our password is next to the word millionth. Let's print out the line containing 'millionth' by ' cat data.txt | grep "millionth" '.
-For a one liner, " cat data.txt  | grep millionth | tr -d {millionth} | tr -d [:space:] "
+For a one liner, " cat data.txt | grep "millionth" | awk '{print $2}' "
 
     Password for Level 8 is cvX2JJa4CFALtqS87jk27qwqGhBM9plV
 
@@ -74,14 +74,14 @@ This is also a one liner, " cat data.txt | sort | uniq -u "
 Level 9 --> Level 10
 Intiutively, one would try " cat data.txt | grep ===== " from the premise of our hint given. But turns out that it is a binary file disguised in a .txt format.
 Doing a " file data.txt " returns ' data ' type, and not ASCII. Hence, we use " strings data.txt | grep ====="
-For a one liner, " echo $(strings data.txt | grep ===== | tr -d {=====} | tail -n 1 | tr -d [:space:]) " should do just fine!
+For a one liner, " strings data.txt | grep ===== | tail -n 1 | tr -d [:space:] " should do just fine!
 
     Password for Level 10 is truKLdjsbJ5g7yyJ2X2R0o3a5HQJFuLk
 
 
 Level 10 --> Level 11
 " cat data.txt | base64 -d - " base64 -d decodes the base64 encoded data in data.txt.
-For a one liner, " cat data.txt | base64 -d - | cut -d" " -f 4 "
+For a one liner, " cat data.txt | base64 -d - | awk '{print $4}'
 
     Password for Level 11 is IFukwKGsFW8MOq3IRFqrxE1hxTNEbUPR
 
@@ -89,7 +89,7 @@ For a one liner, " cat data.txt | base64 -d - | cut -d" " -f 4 "
 Level 11 --> Level 12
 If we read data.txt, all the alphabets are rotated/shifted by 13 postitions. We could either use an online Rot13 decoder or the local commandline for decoding this.
 ' tr ' command means translate. We could ask it to shift all the alphabets, capital and small alike, by 13 positions.
-For a one liner, " cat data.txt | tr '[A-Za-z]' '[N-ZA-Mn-za-m]' | cut -d" " -f 4 "
+For a one liner, " cat data.txt | tr '[A-Za-z]' '[N-ZA-Mn-za-m]' | awk '{print $4}' "
 
     Password for Level 12 is 5Te8Y4drgCRfCx8ugdwuEX8KFC6k2EUu
 
@@ -119,14 +119,16 @@ Here we are presented with ' sshkey.private ' which we can use to login via ssh 
 
 
 Level 14 --> Level 15
-This level teaches us some nc (netcat) basics. We connect via " nc localhost 30000 " and enter our password to Level 14.
-
+This level teaches us some nc (netcat) basics. We connect via " nc localhost 30000 " and enter our password to Level 14, or directly echo our password into the nc command. " sed '2q;d' " here displays only the second line of output.
+One liner - echo 4wcYUJFw0k0XLShlDzztnTBHiqxU3b3e | nc localhost 30000 | sed '2q;d'
+    
     Password for Level 15 is BfMYroe26WYalil77FoDi9qh59eK5xNr
 
 
 Level 15 --> level 16
 This level teaches us to connect via SSL, for which we use ' openssl '.
 " openssl s_client -ign_eof -connect localhost:30001 " and enter the password to Level 15.
+One liner - echo BfMYroe26WYalil77FoDi9qh59eK5xNr | openssl s_client -ign_eof -connect localhost:30001 2>/dev/null | sed '65q;d'
 
     Password for Level 16 is cluFn7wTiGryunymYOu4RcffSxQluehd
 
@@ -137,7 +139,7 @@ We are presented with two open ports. Adding a -sV option shows us the running s
 Ports 31518 & 31790 are shown open.
 " cat /etc/bandit_pass/bandit16 | openssl s_client -connect localhost:31790 -quiet " gives us a private ssh key, which can be used to login to the next level.
 Copy from the " --BEGIN RSA to ---END RSA KEY " and paste it into a file we create with " cd $(mktemp -d); nano sshkey.private; chmod 600 sshkey.private "
-(chmod 600 only gives owner read/write permission and not the others. chmod 777 is too insecure as it gives rwx permissions to everyone)
+(chmod 600 only gives owner read/write permission and not the others. ' chmod 777 ' is too insecure as it gives rwx permissions to everyone)
 Save the file with Ctrl+O and Ctrl+X to exit.
 " ssh -i sshkey.private bandit17@localhost " gives us the password.
 
